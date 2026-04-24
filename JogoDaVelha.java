@@ -1,42 +1,57 @@
 import java.util.Scanner;
 
 public class JogoDaVelha {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in); 
-        Tabuleiro tabuleiro = new Tabuleiro();
-        
-        System.out.println("--- JOGO DA VELHA INTERATIVO ---");
-        System.out.print("Escolha seu símbolo (X ou O): ");
-        char simboloHumano = sc.next().toUpperCase().charAt(0);
-        char simboloMaquina = (simboloHumano == 'X') ? 'O' : 'X';
+    private Jogador jogador1;
+    private Jogador jogador2;
+    private Tabuleiro tabuleiro;
 
-        Jogador j1 = new Jogador("Jogador 1", simboloHumano, true);
-        Jogador j2 = new Jogador("Jogador 2", simboloMaquina, false);
+    public JogoDaVelha(Jogador jogador1, Jogador jogador2, Tabuleiro tabuleiro) {
+        this.jogador1 = jogador1;
+        this.jogador2 = jogador2;
+        this.tabuleiro = tabuleiro;
+    }
 
-        Jogador atual = j1;
-        boolean jogoAtivo = true;
+    private void iniciar() {
+        Scanner leitor = new Scanner(System.in);
+        Jogador jogadorAtual = jogador1;
+        boolean continuar = true;
 
-        tabuleiro.exibir();
-
-        while (jogoAtivo) {
-            System.out.println("\nVez de: " + atual.getNome());
-            atual.jogar(tabuleiro, sc); 
+        while (continuar) {
             tabuleiro.exibir();
+            
+            jogadorAtual.jogar(tabuleiro, leitor);
 
-            if (tabuleiro.verificarVencedor(atual.getSimbolo())) {
-                System.out.println("\nO " + atual.getNome() + " ganhou");
-                jogoAtivo = false;
+            if (tabuleiro.verificarVencedor(jogadorAtual.getSimbolo())) {
+                tabuleiro.exibir();
+                System.out.println("\nFim de jogo! " + jogadorAtual.getNome() + " venceu!");
+                continuar = false;
             } else if (tabuleiro.estaCheio()) {
-                System.out.println("\nO jogo terminou empatado.");
-                jogoAtivo = false;
+                tabuleiro.exibir();
+                System.out.println("\nEmpate! O jogo deu velha.");
+                continuar = false;
+            } else {
+                jogadorAtual = (jogadorAtual == jogador1) ? jogador2 : jogador1;
             }
-
-    
-            atual = (atual == j1) ? j2 : j1;
         }
+        leitor.close();
+    }
 
-        System.out.println("\nCriado por Emanuelle Donato");
-        
-        sc.close();
+        public static void main(String[] args) {
+        Scanner entrada = new Scanner(System.in);
+
+        System.out.print("Digite o nome do Jogador 1 (X): ");
+        String n1 = entrada.nextLine();
+        Jogador j1 = new Jogador(n1, 'X', true); 
+
+        System.out.print("Digite o nome do Jogador 2 (O): ");
+        String n2 = entrada.nextLine();
+        Jogador j2 = new Jogador(n2, 'O', true); 
+
+        Tabuleiro tab = new Tabuleiro();
+
+        JogoDaVelha jogoDaVelha = new JogoDaVelha(j1, j2, tab);
+        jogoDaVelha.iniciar();
+
+        entrada.close(); 
     }
 }
